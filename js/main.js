@@ -10,8 +10,6 @@
 // Реализовать цепочку протитопов с помощью непосредственного изменения прототипа (__proto__, setPrototypeOf)
 // Реализовать цепочку протитопов с помощью функций конструкторов.
 
-
-
 const objA = {
     name: "Oleg",
     showName() {
@@ -36,8 +34,8 @@ I am ${this.age} years old`
     // __proto__: objB
 }
 
-// Object.setPrototypeOf(objC, objB);
-// Object.setPrototypeOf(objB, objA);
+Object.setPrototypeOf(objC, objB);
+Object.setPrototypeOf(objB, objA);
 
 console.log('----------------------------------')
 console.log(objC, "через __proto__ или Object.setPrototypeOf()")
@@ -67,46 +65,46 @@ I am ${this.age} years old`
 };
 
 console.log('----------------------------------')
-console.log(objCreateB, "через Object.create")
+console.log(objCreateC, "через Object.create")
 console.log(objCreateA.showName());
 console.log(objCreateC.showFullName());
 console.log(objCreateC.showFullInfo());
 
 
 function ObjA (name) {
-    this.name = name,
-    this.showName = function () {
-        return this.name
-    }
+    this.name = name
 }
 
-const objConstructorA = new ObjA("Oleg")
-
-
-function ObjB (surname) {
-    this.surname = surname,
-    this.showFullName = function (){
-        return `My full name: ${this.name} ${this.surname}`
-    }
+ObjA.prototype.showName = function () {
+    return this.name
 }
 
-ObjB.prototype = objConstructorA;
-const objConstructorB = new ObjB("Kolesnuk");
-
-
-function ObjC (age) {
-    this.age = age,
-    this.showFullInfo = function () {
-        return `My name ${this.name} ${this.surname}
-I am ${this.age} years old`
-    }
+function ObjB (name, surname) {
+    ObjA.call(this, name)
+    this.surname = surname
 }
 
-ObjC.prototype = objConstructorB;
-const objConstructorC = new ObjC(24);
+ObjB.prototype = Object.create(ObjA.prototype);
+ObjB.prototype.showFullName = function() {
+    return `My full name: ${this.name} ${this.surname}`
+}
+
+function ObjC (age, surname, name) {
+    ObjB.call(this, name, surname)
+    this.age = age
+}
+
+ObjC.prototype = Object.create(ObjB.prototype);
+ObjC.prototype.showFullInfo = function () {
+    return (`My name ${this.name} ${this.surname}
+I am ${this.age} years old`)
+}
+const objConstructorC = new ObjC(24, 'Kolesnik', 'Oleg');
+
+
 
 console.log('----------------------------------')
 console.log(objConstructorC, 'Через конструктор')
-console.log(objConstructorC.showFullName())
 console.log(objConstructorC.showName())
+console.log(objConstructorC.showFullName())
 console.log(objConstructorC.showFullInfo())
